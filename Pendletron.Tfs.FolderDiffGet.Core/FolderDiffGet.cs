@@ -10,9 +10,9 @@ using System.Threading;
 
 namespace Pendletron.Tfs.FolderDiffGet.Core
 {
-    public class FolderDiffGet : IDisposable
+    public class FolderDiffGetter : IDisposable
     {
-        public FolderDiffGet(string collectionUri, string srcPath, string targetPath, string outputDir)
+        public FolderDiffGetter(string collectionUri, string srcPath, string targetPath, string outputDir)
         {
             TeamCollectionUrl = collectionUri;
             SourcePath = srcPath;
@@ -161,7 +161,6 @@ namespace Pendletron.Tfs.FolderDiffGet.Core
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardInput = true;
             proc.OutputDataReceived += new DataReceivedEventHandler(proc_OutputDataReceived);
-            proc.Exited += new EventHandler(proc_Exited);
 
             WriteToTrace("Starting process: '{0}' with args '{1}'", cmdPromptPath, proc.StartInfo.Arguments);
 
