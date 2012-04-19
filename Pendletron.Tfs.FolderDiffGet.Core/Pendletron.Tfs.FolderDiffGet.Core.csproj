@@ -33,6 +33,10 @@
   <ItemGroup>
     <Reference Include="Microsoft.TeamFoundation.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.TeamFoundation.VersionControl.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Controls, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PrivateAssemblies\Microsoft.TeamFoundation.VersionControl.Controls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,10 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FolderDiffGet.cs" />
+    <Compile Include="BaseFolderDiffGetter.cs" />
+    <Compile Include="TfsInternalsGetter.cs" />
+    <Compile Include="CmdParsingFolderDiffGetter.cs" />
+    <Compile Include="IFolderDiffGetter.cs" />
     <Compile Include="ParseResults.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OutputParser.cs" />
+    <Compile Include="Wrappers\AccessPrivateWrapper.cs" />
+    <Compile Include="Wrappers\FolderDiffElementStateWrapper.cs" />
+    <Compile Include="Wrappers\FolderDiffWrapper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

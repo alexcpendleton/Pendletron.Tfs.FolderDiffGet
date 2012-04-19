@@ -11,7 +11,8 @@
     <RootNamespace>Pendletron.Tfs.FolderDiffGet.Examples.Console</RootNamespace>
     <AssemblyName>Pendletron.Tfs.FolderDiffGet.Examples.Console</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -51,6 +52,9 @@
       <Project>{747EF9FD-4F63-4756-9C6A-62F962F0B07E}</Project>
       <Name>Pendletron.Tfs.FolderDiffGet.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
