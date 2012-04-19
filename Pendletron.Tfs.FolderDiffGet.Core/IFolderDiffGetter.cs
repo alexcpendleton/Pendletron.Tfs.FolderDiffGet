@@ -47,11 +47,6 @@ namespace Pendletron.Tfs.FolderDiffGet.Core
 		bool ViewTargetOnly { get; set; }
 
 		/// <summary>
-		/// Gets or sets a TraceListener for logging messages. Null by default.
-		/// </summary>
-		TraceListener Trace { get; set; }
-
-		/// <summary>
 		/// Writes a message to the TraceListener (if available.)
 		/// </summary>
 		/// <param name="message">The message to write.</param>

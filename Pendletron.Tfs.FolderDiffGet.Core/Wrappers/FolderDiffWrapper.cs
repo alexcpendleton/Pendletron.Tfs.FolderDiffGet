@@ -12,36 +12,59 @@ using Pendletron.Tfs.Core.Wrappers;
 namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 	public class FolderDiffWrapper : IEnumerable
 	{
-		private dynamic _wrapper;
+		private dynamic _folderDiff;
 		private Assembly _vcControlsAssembly;
-		public FolderDiffWrapper(string assemblyPath, string srcPath, VersionSpec srcSpec, string targetPath, VersionSpec targetSpec, VersionControlServer server, RecursionType recursion)
-		{/*
-			_vcAssembly = Assembly.Load("Microsoft.VisualStudio.TeamFoundation.VersionControl");
-			Type t = _vcAssembly.GetType("Microsoft.VisualStudio.TeamFoundation.VersionControl.HatPackage");
-			var prop = t.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static);
-			object instance = prop.GetValue(null, null);
-			_wrapped = new AccessPrivateWrapper(instance);
-		  * */
-			_vcControlsAssembly = Assembly.LoadFrom(assemblyPath);
-			//Type t = _vcControlsAssembly.GetType("Microsoft.TeamFoundation.VersionControl.Controls.FolderDiff");
-			string typeName = "Microsoft.TeamFoundation.VersionControl.Controls.FolderDiff";
-			//internal FolderDiff(string path1, VersionSpec spec1, string path2, VersionSpec spec2, VersionControlServer server, RecursionType recursion);
-			_wrapper = AccessPrivateWrapper.FromType(_vcControlsAssembly, typeName,
-			                                         srcPath, srcSpec, targetPath, targetSpec, server, recursion);
-			_progressUpdateCallbackType = _vcControlsAssembly.GetType(typeName + "+ProgressUpdateCallback");
-			_isCanceledCallbackType = _vcControlsAssembly.GetType(typeName + "+IsCanceledCallback");
-			_phaseChangedCallbackType = _vcControlsAssembly.GetType(typeName + "+PhaseChangedCallback");
-			_folderDiffElementStatType = _vcControlsAssembly.GetType("Microsoft.TeamFoundation.VersionControl.Controls.FolderDiffElementState");
+
+		protected Type _progressUpdateCallbackType;
+		protected Type _isCanceledCallbackType;
+		protected Type _phaseChangedCallbackType;
+		protected Type _folderDiffElementStatType;
+		
+		public const string FolderDiffTypeName = "Microsoft.TeamFoundation.VersionControl.Controls.FolderDiff";
+		public const string VersionControlControlsAssemblyName = "Microsoft.TeamFoundation.VersionControl.Controls";
+		public const string FolderDiffElementStateTypeName = VersionControlControlsAssemblyName + ".FolderDiffElementState";
+		
+		public bool ViewDifferent { get; set; }
+		public bool ViewSame { get; set; }
+		public bool ViewSourceOnly { get; set; }
+		public bool ViewTargetOnly { get; set; }
+
+		public static Assembly LoadVersonControlControlsAssemblyFromApplication()
+		{
+			return Assembly.Load(VersionControlControlsAssemblyName);
 		}
 
-		private Type _progressUpdateCallbackType;
-		private Type _isCanceledCallbackType;
-		private Type _phaseChangedCallbackType;
-		private Type _folderDiffElementStatType;
+		public FolderDiffWrapper(object folderDiffObject):this(folderDiffObject, LoadVersonControlControlsAssemblyFromApplication())
+		{
+			
+		}
+
+		public FolderDiffWrapper(object folderDiffObject, Assembly vcControlsAssembly)
+		{
+			_folderDiff = folderDiffObject;
+			_vcControlsAssembly = vcControlsAssembly;
+			SetupTypesFromAssembly();
+		}
+
+		public FolderDiffWrapper(string assemblyPath, string srcPath, VersionSpec srcSpec, string targetPath, VersionSpec targetSpec, VersionControlServer server, RecursionType recursion)
+		{
+			_vcControlsAssembly = Assembly.LoadFrom(assemblyPath);
+			//internal FolderDiff(string path1, VersionSpec spec1, string path2, VersionSpec spec2, VersionControlServer server, RecursionType recursion);
+			_folderDiff = AccessPrivateWrapper.FromType(_vcControlsAssembly, FolderDiffTypeName,
+			                                         srcPath, srcSpec, targetPath, targetSpec, server, recursion);
+			SetupTypesFromAssembly();
+		}
+
+		protected virtual void SetupTypesFromAssembly()
+		{
+			_progressUpdateCallbackType = _vcControlsAssembly.GetType(FolderDiffTypeName + "+ProgressUpdateCallback");
+			_isCanceledCallbackType = _vcControlsAssembly.GetType(FolderDiffTypeName + "+IsCanceledCallback");
+			_phaseChangedCallbackType = _vcControlsAssembly.GetType(FolderDiffTypeName + "+PhaseChangedCallback");
+			_folderDiffElementStatType = _vcControlsAssembly.GetType(FolderDiffElementStateTypeName);
+		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
-			dynamic x = _wrapper;
 			//internal void Initialize(ProgressUpdateCallback progressCallback, IsCanceledCallback isCanceledCallback, PhaseChangedCallback phaseChangedCallback)
 			var types = new Type[]
 			            {
@@ -49,56 +72,28 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 							_isCanceledCallbackType,
 							_phaseChangedCallbackType
 			            };
-			var o = new object();
-			var ip = new IntPtr();
-			//var nullProg = Delegate.CreateDelegate(_progressUpdateCallbackType,) // Activator.CreateInstance(_progressUpdateCallbackType, o, ip);
-			var nullProg = Convert.ChangeType(null, _progressUpdateCallbackType);
-			var nullIsCanceled = Convert.ChangeType(null, _isCanceledCallbackType);// Activator.CreateInstance(_isCanceledCallbackType, o, ip);
-			var nullPhase = Convert.ChangeType(null, _phaseChangedCallbackType);// Activator.CreateInstance(_phaseChangedCallbackType, o, ip);
-			//x.Initialize(nullProg, nullIsCanceled, nullPhase);
 
-			
-			var initMethod = _wrapper._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
-			initMethod.Invoke(_wrapper._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
+			var nullProg = Convert.ChangeType(null, _progressUpdateCallbackType);
+			var nullIsCanceled = Convert.ChangeType(null, _isCanceledCallbackType);
+			var nullPhase = Convert.ChangeType(null, _phaseChangedCallbackType);
+
+			//x.Initialize(nullProg, nullIsCanceled, nullPhase);
+			var initMethod = _folderDiff._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
+			initMethod.Invoke(_folderDiff._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
 			bool? filterLocalPathsOnly = false;
 			string filter = "";
 			var view = MakeViewEnum();
-			
-			/*
-			 * */
-			/*
-      FolderDiffOptions options = this.m_folderDiff.Options;
-      options.UseRegistryDefaults = false;
-      if (filter != null)
-        options.FilterHistory = new List<string>()
-        {
-          filter
-        };
-      if (filterLocalPathsOnly.HasValue && filterLocalPathsOnly.HasValue)
-        options.FilterLocalPathsOnly = filterLocalPathsOnly.Value;
-      if (!view.HasValue || !view.HasValue)
-        return;
-      options.ViewOptions = view.Value;*/
-			dynamic options = new AccessPrivateWrapper(_wrapper.Options);
+			dynamic options = new AccessPrivateWrapper(_folderDiff.Options);
 			options.UseRegistryDefaults = false;
 			if (view != null)
 			{
 				options.ViewOptions = view;
 			}
-			//x.InitializeOption(filter, filterLocalPathsOnly, view);
-			x.Compare();
-
-
-			var e = x.GetEnumerator();
-			return e ?? null;
+			_folderDiff.Compare();
+			return _folderDiff.GetEnumerator();
 		}
 
-		public bool ViewDifferent { get; set; }
-		public bool ViewSame { get; set; }
-		public bool ViewSourceOnly { get; set; }
-		public bool ViewTargetOnly { get; set; }
-
-		public object MakeViewEnum()
+		public virtual object MakeViewEnum()
 		{
 			FolderDiffElementStateWrapper w = FolderDiffElementStateWrapper.None;
 			if(ViewDifferent)

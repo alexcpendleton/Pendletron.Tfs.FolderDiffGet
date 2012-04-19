@@ -4,8 +4,14 @@ using Microsoft.TeamFoundation.VersionControl.Client;
 using System;
 using System.IO;
 using Microsoft.Win32;
+using System.Reflection;
+using Microsoft.TeamFoundation.Client;
 namespace Pendletron.Tfs.FolderDiffGet.Core {
-	public class TfsInternalsGetter : BaseFolderDiffGetter {
+	public class FolderDiffInternalsGetter : BaseFolderDiffGetter {
+		public FolderDiffInternalsGetter(object folderDiffObject, TfsTeamProjectCollection collection, string outputDirectory):base("", "", "", outputDirectory) {
+			_folderDiff = new FolderDiffWrapper(folderDiffObject, FolderDiffWrapper.LoadVersonControlControlsAssemblyFromApplication());
+			_collection = collection;
+		}
 		/// <summary>
 		/// 
 		/// </summary>
@@ -14,7 +20,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		/// <param name="targetPath">The path to the target of the compare</param>
 		/// <param name="outputDir">The directory into which the files will be downloaded</param>
 		/// <param name="tfsVcControlsDllPath">The path to the Microsoft.TeamFoundation.VersionControl.Controls.dll file. You can probably use DeriveTfsVcControlsDllPathFromRegistry for this.</param>
-		public TfsInternalsGetter(string collectionUri, string srcPath, string targetPath, string outputDir, string tfsVcControlsDllPath)
+		public FolderDiffInternalsGetter(string collectionUri, string srcPath, string targetPath, string outputDir, string tfsVcControlsDllPath)
 			: base(collectionUri, srcPath, targetPath, outputDir) {
 			PathToTfsVcControlsDll = tfsVcControlsDllPath;
 		}
@@ -24,8 +30,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		/// </summary>
 		/// <param name="version">The visual studio version.</param>
 		/// <returns></returns>
-		public static string DeriveTfsVcControlsDllPathFromRegistry(string version = "10.0")
-		{
+		public static string DeriveTfsVcControlsDllPathFromRegistry(string version = "10.0") {
 			string installDir = GetVisualStudioInstallationPath(version);
 			string result = Path.GetFullPath(Path.Combine(installDir, @"PrivateAssemblies/Microsoft.TeamFoundation.VersionControl.Controls.dll"));
 			return result;

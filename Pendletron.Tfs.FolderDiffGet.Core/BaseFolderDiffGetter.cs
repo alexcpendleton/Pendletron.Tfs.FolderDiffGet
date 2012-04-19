@@ -64,18 +64,11 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		public bool ViewTargetOnly { get; set; }
 
 		/// <summary>
-		/// Gets or sets a TraceListener for logging messages. Null by default.
-		/// </summary>
-		public TraceListener Trace { get; set; }
-
-		/// <summary>
 		/// Writes a message to the TraceListener (if available.)
 		/// </summary>
 		/// <param name="message">The message to write.</param>
 		public virtual void WriteToTrace(string message) {
-			if (Trace != null) {
-				Trace.WriteLine(message);
-			}
+			Trace.WriteLine(message);
 		}
 		/// <summary>
 		/// Formats and writes a message to the TraceListener (if available.)
@@ -84,15 +77,17 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		/// <param name="args">The formatting arguments.</param>
 		/// <remarks>Does a String.Format(message, args) and calls WriteToTrace with the result.</remarks>
 		public virtual void WriteToTrace(string message, params object[] args) {
-			if (Trace != null) {
-				WriteToTrace(String.Format(message, args));
-			}
+			WriteToTrace(String.Format(message, args));
 		}
+
 		/// <summary>
 		/// Setups up and connects to the TfsTeamProjectCollection, uses UICredentialsProvider
 		/// </summary>
 		public virtual void SetupProjectCollection() {
-			_collection = new TfsTeamProjectCollection(new Uri(TeamCollectionUrl), new UICredentialsProvider());
+			if (_collection == null)
+			{
+				_collection = new TfsTeamProjectCollection(new Uri(TeamCollectionUrl), new UICredentialsProvider());
+			}
 			_collection.EnsureAuthenticated();
 		}
 
