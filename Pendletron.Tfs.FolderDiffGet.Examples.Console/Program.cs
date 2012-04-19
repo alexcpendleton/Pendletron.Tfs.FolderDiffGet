@@ -15,10 +15,12 @@ namespace Pendletron.Tfs.FolderDiffGet.Examples.Console {
 			string outputDirectory = args[3]; // The directory where to download the files
 
 			//var getter = new CmdParsingFolderDiffGetter(collectionUrl, sourcePath, targetPath, outputDirectory);
-			var getter = new TfsInternalsGetter(collectionUrl, sourcePath, targetPath, outputDirectory);
+			string dllPath = TfsInternalsGetter.DeriveTfsVcControlsPathFromRegistry();
+			var getter = new TfsInternalsGetter(collectionUrl, sourcePath, targetPath, outputDirectory, dllPath);
 			// You may need to change these if you have things installed in other places
 			//getter.VcVarsBatPath
 			//getter.CommandPromptPath
+
 			getter.Trace = new ConsoleTraceListener();
 			getter.Go();
 		}

@@ -19,7 +19,6 @@ namespace Pendletron.Tfs.FolderDiffGet.Core
 
         public string SourcePath { get; set; }
         public string TargetPath { get; set; }
-
         public string HeaderOutlineText { get; set; }
         public string ExistOnlyInText { get; set; }
         public string SummaryText { get; set; }
