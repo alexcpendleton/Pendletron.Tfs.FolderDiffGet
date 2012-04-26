@@ -8,9 +8,12 @@ using System.Reflection;
 using Microsoft.TeamFoundation.Client;
 namespace Pendletron.Tfs.FolderDiffGet.Core {
 	public class FolderDiffInternalsGetter : BaseFolderDiffGetter {
-		public FolderDiffInternalsGetter(object folderDiffObject, TfsTeamProjectCollection collection, string outputDirectory):base("", "", "", outputDirectory) {
+		public FolderDiffInternalsGetter(dynamic folderDiffObject, TfsTeamProjectCollection collection, string outputDirectory):base("", "", "", outputDirectory) {
 			_folderDiff = new FolderDiffWrapper(folderDiffObject, FolderDiffWrapper.LoadVersonControlControlsAssemblyFromApplication());
 			_collection = collection;
+			SourcePath = _folderDiff._folderDiff.m_path1;
+			TargetPath = _folderDiff._folderDiff.m_path2;
+
 		}
 		/// <summary>
 		/// 
@@ -69,11 +72,18 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 			var targetSpec = VersionSpec.Latest;
 			var recursion = RecursionType.Full;
 			string assemblyPath = PathToTfsVcControlsDll; // TODO: Make this loaded from config or something
-			_folderDiff = new FolderDiffWrapper(assemblyPath, SourcePath, srcSpec, TargetPath, targetSpec, GetVcs(), recursion);
-			_folderDiff.ViewSame = ViewSame;
-			_folderDiff.ViewDifferent = ViewDifferent;
-			_folderDiff.ViewSourceOnly = ViewSourceOnly;
-			_folderDiff.ViewTargetOnly = ViewTargetOnly;
+			if (_folderDiff == null) {
+				_folderDiff = new FolderDiffWrapper(assemblyPath, SourcePath, srcSpec, TargetPath, targetSpec, GetVcs(), recursion);
+				_folderDiff.ViewSame = ViewSame;
+				_folderDiff.ViewDifferent = ViewDifferent;
+				_folderDiff.ViewSourceOnly = ViewSourceOnly;
+				_folderDiff.ViewTargetOnly = ViewTargetOnly;
+			}
+			else
+			{
+				
+			}
+
 			base.Go();
 		}
 

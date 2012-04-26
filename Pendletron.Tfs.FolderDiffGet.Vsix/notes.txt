@@ -1,0 +1,3 @@
+﻿Finding & manipulating toolbars
+http://blogs.msdn.com/b/dr._ex/archive/2007/04/17/using-enablevsiplogging-to-identify-menus-and-commands-with-vs-2005-sp1.aspx
+http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/53309d31-035b-4493-b0e1-b9367e73f197/

@@ -12,7 +12,7 @@ using Pendletron.Tfs.Core.Wrappers;
 namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 	public class FolderDiffWrapper : IEnumerable
 	{
-		private dynamic _folderDiff;
+		public dynamic _folderDiff;
 		private Assembly _vcControlsAssembly;
 
 		protected Type _progressUpdateCallbackType;
@@ -41,7 +41,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 
 		public FolderDiffWrapper(object folderDiffObject, Assembly vcControlsAssembly)
 		{
-			_folderDiff = folderDiffObject;
+			_folderDiff = new AccessPrivateWrapper(folderDiffObject);
 			_vcControlsAssembly = vcControlsAssembly;
 			SetupTypesFromAssembly();
 		}
