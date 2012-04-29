@@ -105,10 +105,36 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 
 
 		public abstract HashSet<string> GetDifferentFilePaths();
+		/*
+		public virtual Workspace CurrentWorkspace { get; set; }
+
+		public string GetServerPath(string filePath)
+		{
+			if (filePath.StartsWith("$/")) return filePath; //already a server path
+
+		}
+
+
+		protected void GetWorkspaceForNonSolutionPath(string localFilePath, Action<Workspace> ifFound) {
+			Workstation station = Workstation.Current;
+			Workspace result = null;
+			if (station != null) {
+				var wsInfo = station.GetLocalWorkspaceInfo(localFilePath);
+				result.GetServerItemForLocalItem()
+				using (var collection = new TfsTeamProjectCollection(wsInfo.ServerUri)) {
+					if (collection != null) {
+						result = wsInfo.GetWorkspace(collection);
+						if (result != null) {
+							ifFound(result);
+						}
+					}
+				}
+			}
+		}
+		 * */
 
 		public virtual void DownloadFiles(System.Collections.Generic.HashSet<string> filesToGet)
 		{
-
 			SetupProjectCollection();
 
 			var vcs = _collection.GetService<VersionControlServer>();
@@ -131,6 +157,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 					item.DownloadFile(outputFilePath);
 				}
 			}
+			WriteToTrace("Finished downloading.");
 		}
 	}
 }

@@ -11,8 +11,8 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		public FolderDiffInternalsGetter(dynamic folderDiffObject, TfsTeamProjectCollection collection, string outputDirectory):base("", "", "", outputDirectory) {
 			_folderDiff = new FolderDiffWrapper(folderDiffObject, FolderDiffWrapper.LoadVersonControlControlsAssemblyFromApplication());
 			_collection = collection;
-			SourcePath = _folderDiff._folderDiff.m_path1;
-			TargetPath = _folderDiff._folderDiff.m_path2;
+			SourcePath = _folderDiff.Path1; 
+			TargetPath = _folderDiff.Path2;
 
 		}
 		/// <summary>

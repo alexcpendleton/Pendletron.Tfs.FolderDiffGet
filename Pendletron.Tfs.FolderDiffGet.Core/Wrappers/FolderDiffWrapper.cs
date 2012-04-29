@@ -115,5 +115,9 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 			object toParse = w.ToString();
 			return Convert.ChangeType(Enum.Parse(_folderDiffElementStatType, toParse.ToString()), _folderDiffElementStatType);
 		}
+
+		public string Path1 { get { return _folderDiff.m_path1; } set { _folderDiff.m_path1 = value; } }
+		public string Path2 { get { return _folderDiff.m_path2; } set { _folderDiff.m_path2 = value; } }
+
 	}
 }
