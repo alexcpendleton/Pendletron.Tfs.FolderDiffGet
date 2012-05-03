@@ -103,61 +103,89 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 			}
 		}
 
-
-		public abstract HashSet<string> GetDifferentFilePaths();
-		/*
-		public virtual Workspace CurrentWorkspace { get; set; }
-
-		public string GetServerPath(string filePath)
+		public virtual void CopyLocalFile(IFolderDiffEntry diff, string outputPath)
 		{
-			if (filePath.StartsWith("$/")) return filePath; //already a server path
-
-		}
-
-
-		protected void GetWorkspaceForNonSolutionPath(string localFilePath, Action<Workspace> ifFound) {
-			Workstation station = Workstation.Current;
-			Workspace result = null;
-			if (station != null) {
-				var wsInfo = station.GetLocalWorkspaceInfo(localFilePath);
-				result.GetServerItemForLocalItem()
-				using (var collection = new TfsTeamProjectCollection(wsInfo.ServerUri)) {
-					if (collection != null) {
-						result = wsInfo.GetWorkspace(collection);
-						if (result != null) {
-							ifFound(result);
-						}
-					}
+			string sourcePath = diff.Path2;
+			if(File.Exists(sourcePath))
+			{
+				WriteToTrace("Copying local path: '{0}'", sourcePath);
+				string dir = Path.GetDirectoryName(outputPath);
+				if (!Directory.Exists(dir))
+				{
+					Directory.CreateDirectory(dir);
 				}
+				File.Copy(sourcePath, outputPath, true);
 			}
 		}
-		 * */
 
-		public virtual void DownloadFiles(System.Collections.Generic.HashSet<string> filesToGet)
+		private VersionControlServer _vcs = null;
+		public VersionControlServer Vcs
+		{
+			get
+			{
+				if (_vcs == null)
+				{
+					_vcs = _collection.GetService<VersionControlServer>();
+				}
+				return _vcs;
+			}
+		}
+
+		public virtual void DownloadFromTfs(IFolderDiffEntry diff, string outputPath)
+		{
+			int deletionID = 0; // TODO: what is this?
+			WriteToTrace("Downloading file from TFS: '{0}'", diff.Path2);
+			Vcs.DownloadFile(diff.Path2, deletionID, diff.Path2VersionSpec, outputPath);
+		}
+
+		public virtual bool IsDirectory(IFolderDiffEntry item)
+		{
+			return item.ItemType == ItemType.Folder;
+		}
+
+		public abstract List<IFolderDiffEntry> GetDifferentFilePaths();
+		
+		public virtual void DownloadFiles(List<IFolderDiffEntry> filesToGet)
 		{
 			SetupProjectCollection();
 
 			var vcs = _collection.GetService<VersionControlServer>();
-			foreach (var serverPath in filesToGet) {
-				string outputFilePath = serverPath.Replace(TargetPath, "");
-				if (outputFilePath.StartsWith("/")) {
+			foreach (var diff in filesToGet)
+			{
+				string outputFilePath = diff.Path2;
+				outputFilePath = outputFilePath.Replace(TargetPath, "");
+				if(outputFilePath.StartsWith("/"))
+				{
+					outputFilePath = outputFilePath.Remove(0, 1);
+				}
+				if (outputFilePath.StartsWith("\\"))
+				{
 					outputFilePath = outputFilePath.Remove(0, 1);
 				}
 				outputFilePath = Path.Combine(OutputDirectory, outputFilePath);
 				outputFilePath = Path.GetFullPath(outputFilePath);
-				var item = vcs.GetItem(serverPath);
-				if (item.ItemType.HasFlag(ItemType.Folder)) {
+
+				if (IsDirectory(diff))
+				{
 					if (!Directory.Exists(outputFilePath)) {
 						WriteToTrace("Creating directory: '{0}'", outputFilePath);
 						Directory.CreateDirectory(outputFilePath);
 					}
 				}
-				else {
-					WriteToTrace("Downloading file from TFS: '{0}'", outputFilePath);
-					item.DownloadFile(outputFilePath);
+				else
+				{
+					if(diff.IsPath2Local)
+					{
+						// Just copy the file to the new path
+						CopyLocalFile(diff, outputFilePath);
+					}
+					else
+					{
+						DownloadFromTfs(diff, outputFilePath);
+					}
 				}
 			}
-			WriteToTrace("Finished downloading.");
+			WriteToTrace("Finished.");
 		}
 	}
 }

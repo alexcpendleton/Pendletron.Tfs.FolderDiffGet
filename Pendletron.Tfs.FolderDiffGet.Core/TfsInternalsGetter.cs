@@ -104,8 +104,8 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		/// Gets the folder differences from the FolderDiff.
 		/// </summary>
 		/// <returns></returns>
-		public override System.Collections.Generic.HashSet<string> GetDifferentFilePaths() {
-			var results = new HashSet<string>();
+		public override System.Collections.Generic.List<IFolderDiffEntry> GetDifferentFilePaths() {
+			var results = new List<IFolderDiffEntry>();
 			var o = new List<object>();
 			foreach (var x in _folderDiff) {
 				dynamic folder = new AccessPrivateWrapper(x);
@@ -114,8 +114,12 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 				dynamic wrappedObject = files._wrapped;
 				foreach (var f in wrappedObject) {
 					dynamic f2 = new AccessPrivateWrapper(f);
-					if (f2 != null) {
-						results.Add(f2.Path2 as string);
+					if (f2 != null)
+					{
+						var entry = new FolderDiffEntry(f2);
+						entry.IsPath2Local = _folderDiff.IsPath2Local;
+						entry.Path2VersionSpec = _folderDiff.Path2VersionSpec;
+						results.Add(entry);
 					}
 
 				}

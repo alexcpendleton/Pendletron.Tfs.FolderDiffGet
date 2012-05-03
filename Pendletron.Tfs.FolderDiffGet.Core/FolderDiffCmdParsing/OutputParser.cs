@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Pendletron.Tfs.FolderDiffGet.Core
+namespace Pendletron.Tfs.FolderDiffGet.Core.FolderDiffCmdParsing
 {
     public class OutputParser
     {

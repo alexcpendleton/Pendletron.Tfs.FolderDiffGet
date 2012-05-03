@@ -73,13 +73,13 @@ namespace Pendletron.Tfs.FolderDiffGet.Core
 		/// <summary>
 		/// Parses the results of the process output and gets the files.
 		/// </summary>
-		HashSet<string> GetDifferentFilePaths();
+		List<IFolderDiffEntry> GetDifferentFilePaths();
 
 		/// <summary>
 		/// Gets all files in the parsed results.
 		/// </summary>
 		/// <param name="parsed">The parsed results.</param>
-		void DownloadFiles(HashSet<string> files);
+		void DownloadFiles(List<IFolderDiffEntry> files);
 
 		/// <summary>
 		/// Disposes the process and the Tfs collection connection.

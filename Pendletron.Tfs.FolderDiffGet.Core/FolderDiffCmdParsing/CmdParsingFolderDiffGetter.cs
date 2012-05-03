@@ -8,12 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Pendletron.Tfs.FolderDiffGet.Core
+namespace Pendletron.Tfs.FolderDiffGet.Core.FolderDiffCmdParsing
 {
-	public class CmdParsingFolderDiffGetter : BaseFolderDiffGetter
+	public class CmdParsingFolderDiffGetter : TextParsingFolderDiffGetter
 	{
         public CmdParsingFolderDiffGetter(string collectionUri, string srcPath, string targetPath, string outputDir)
-			:base(collectionUri, srcPath, targetPath, outputDir)
+			:base(collectionUri, srcPath, targetPath, outputDir, "")
         {
             FolderDiffOutputFilePath = "FolderDiffOutput.txt";
             CommandPromptPath = @"c:\windows\system32\cmd.exe";
@@ -187,10 +187,8 @@ namespace Pendletron.Tfs.FolderDiffGet.Core
 			SetupProjectCollection();
 			RunCommandLineFolderDiff();
             string output = _output.ToString();
-            
-            var parser = new OutputParser(SourcePath, TargetPath);
-            var results = parser.Parse(output);
-			return results.MergeAll();
+			TextToParse = output;
+			return base.GetDifferentFilePaths();
         }
 
 		/// <summary>

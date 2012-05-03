@@ -12,7 +12,7 @@ using Pendletron.Tfs.Core.Wrappers;
 namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 	public class FolderDiffWrapper : IEnumerable
 	{
-		public dynamic _folderDiff;
+		public dynamic FolderDiff { get; set; }
 		private Assembly _vcControlsAssembly;
 
 		protected Type _progressUpdateCallbackType;
@@ -41,7 +41,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 
 		public FolderDiffWrapper(object folderDiffObject, Assembly vcControlsAssembly)
 		{
-			_folderDiff = new AccessPrivateWrapper(folderDiffObject);
+			FolderDiff = new AccessPrivateWrapper(folderDiffObject);
 			_vcControlsAssembly = vcControlsAssembly;
 			SetupTypesFromAssembly();
 		}
@@ -50,7 +50,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 		{
 			_vcControlsAssembly = Assembly.LoadFrom(assemblyPath);
 			//internal FolderDiff(string path1, VersionSpec spec1, string path2, VersionSpec spec2, VersionControlServer server, RecursionType recursion);
-			_folderDiff = AccessPrivateWrapper.FromType(_vcControlsAssembly, FolderDiffTypeName,
+			FolderDiff = AccessPrivateWrapper.FromType(_vcControlsAssembly, FolderDiffTypeName,
 			                                         srcPath, srcSpec, targetPath, targetSpec, server, recursion);
 			SetupTypesFromAssembly();
 		}
@@ -77,20 +77,19 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 			var nullIsCanceled = Convert.ChangeType(null, _isCanceledCallbackType);
 			var nullPhase = Convert.ChangeType(null, _phaseChangedCallbackType);
 
-			//x.Initialize(nullProg, nullIsCanceled, nullPhase);
-			var initMethod = _folderDiff._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
-			initMethod.Invoke(_folderDiff._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
+			var initMethod = FolderDiff._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
+			initMethod.Invoke(FolderDiff._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
 			bool? filterLocalPathsOnly = false;
 			string filter = "";
 			var view = MakeViewEnum();
-			dynamic options = new AccessPrivateWrapper(_folderDiff.Options);
+			dynamic options = new AccessPrivateWrapper(FolderDiff.Options);
 			options.UseRegistryDefaults = false;
 			if (view != null)
 			{
 				options.ViewOptions = view;
 			}
-			_folderDiff.Compare();
-			return _folderDiff.GetEnumerator();
+			FolderDiff.Compare();
+			return FolderDiff.GetEnumerator();
 		}
 
 		public virtual object MakeViewEnum()
@@ -116,8 +115,12 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 			return Convert.ChangeType(Enum.Parse(_folderDiffElementStatType, toParse.ToString()), _folderDiffElementStatType);
 		}
 
-		public string Path1 { get { return _folderDiff.m_path1; } set { _folderDiff.m_path1 = value; } }
-		public string Path2 { get { return _folderDiff.m_path2; } set { _folderDiff.m_path2 = value; } }
+		public string Path1 { get { return FolderDiff.m_path1; } set { FolderDiff.m_path1 = value; } }
+		public string Path2 { get { return FolderDiff.m_path2; } set { FolderDiff.m_path2 = value; } }
+		public bool IsPath2Local { get { return FolderDiff.IsPath2Local; } set { FolderDiff.IsPath2Local = value; } }
+		public string DetailedRootPath2 { get { return FolderDiff.DetailedRootPath2; } set { FolderDiff.DetailedRootPath2 = value; } }
+		public VersionSpec Path2VersionSpec { get { return FolderDiff.Path2VersionSpec; } set { FolderDiff.Path2VersionSpec = value; } }
+		public Workspace Workspace { get { return FolderDiff.Workspace; } set { FolderDiff.Workspace = value; } }
 
 	}
 }
