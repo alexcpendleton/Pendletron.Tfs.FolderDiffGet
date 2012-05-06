@@ -38,6 +38,9 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 	// This attribute is needed to let the shell know that this package exposes some menus.
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	[Guid(GuidList.guidPendletron_Tfs_FolderDiffGet_VsixPkgString)]
+	[ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
+	[ProvideAutoLoad("{f1536ef8-92ec-443c-9ed7-fdadf150da82}")]
+	[ProvideAutoLoad("{8fe2df1d-e0da-4ebe-9d5c-415d40e487b5}")]
 	public sealed class Pendletron_Tfs_FolderDiffGet_VsixPackage : Package {
 		/// <summary>
 		/// Default constructor of the package.
@@ -50,11 +53,6 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 			Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
 		}
 
-
-
-		/////////////////////////////////////////////////////////////////////////////
-		// Overriden Package Implementation
-		#region Package Members
 
 		/// <summary>
 		/// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -69,12 +67,26 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 			if (null != mcs) {
 				// Create the command for the menu item.
 				CommandID menuCommandID = new CommandID(GuidList.guidPendletron_Tfs_FolderDiffGet_VsixCmdSet, (int)PkgCmdIDList.cmdidGetFolderDiff);
-				MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+				OleMenuCommand menuItem = new OleMenuCommand(MenuItemCallback, menuCommandID);
+				menuItem.BeforeQueryStatus += new EventHandler(menuItem_BeforeQueryStatus);
 				mcs.AddCommand(menuItem);
 			}
-			_outputPane = CreatePane(OutputPaneGuid, OutputPaneTitle, true, true);
 		}
-		#endregion
+
+		protected bool IsActiveWindowFolderDiff()
+		{
+			var doc = DTEInstance.ActiveDocument;
+			Guid guid = new Guid("E3FC08BE-3924-11DB-8AF6-B622A1EF5492");
+			var window = DTEInstance.ActiveWindow;
+
+			return window.ObjectKind.ToUpper().Contains(guid.ToString().ToUpper());
+		}
+
+		void menuItem_BeforeQueryStatus(object sender, EventArgs e)
+		{
+			var menuCommand = sender as MenuCommand;
+			menuCommand.Visible = IsActiveWindowFolderDiff();
+		}
 
 		/// <summary>
 		/// This function is the callback used to execute a command when the a menu item is clicked.
@@ -134,21 +146,18 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 			}
 		}
 		public void GetActiveDocument() {
-			var doc = DTEInstance.ActiveDocument;
-			Guid guid = new Guid("E3FC08BE-3924-11DB-8AF6-B622A1EF5492");
-			var window = DTEInstance.ActiveWindow;
-
-			if (window.ObjectKind.ToUpper().Contains(guid.ToString().ToUpper())) {
+			if (IsActiveWindowFolderDiff()) {
+				if (_outputPane == null)
+				{
+					_outputPane = CreatePane(OutputPaneGuid, OutputPaneTitle, true, true);
+				}
 				var dlForm = new DownloadForm();
 				dlForm.Download += new EventHandler<DownloadEventArgs>(dlForm_Download);
 				dlForm.Show();
 			}
+		}
 			//((Microsoft.TeamFoundation.VersionControl.Controls.ControlFolderDiffDisplay)(hatpack._wrapped.FolderDiffManager.FolderDiffToolWindows[0].FolderDiffControl)).FolderDiff
 
-
-
-
-		}
 
 		public readonly Guid OutputPaneGuid = new Guid("4051A975-52F5-4D8A-9987-62E11AEB9A40");
 		public const string OutputPaneTitle = "FolderDiffGet";
@@ -156,18 +165,19 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 
 		protected IVsOutputWindowPane CreatePane(Guid paneGuid, string title, bool visible, bool clearWithSolution) {
 			IVsOutputWindow output = (IVsOutputWindow)GetService(typeof(SVsOutputWindow));
-			IVsOutputWindowPane pane;
+			IVsOutputWindowPane pane = null;
+			if (output != null) {
+				// Create a new pane.
+				output.CreatePane(
+					ref paneGuid,
+					title,
+					Convert.ToInt32(visible),
+					Convert.ToInt32(clearWithSolution));
 
-			// Create a new pane.
-			output.CreatePane(
-				ref paneGuid,
-				title,
-				Convert.ToInt32(visible),
-				Convert.ToInt32(clearWithSolution));
-
-			// Retrieve the new pane.
-			output.GetPane(ref paneGuid, out pane);
-
+				// Retrieve the new pane.
+				output.GetPane(ref paneGuid, out pane);
+				
+			}
 			return pane;
 		}
 

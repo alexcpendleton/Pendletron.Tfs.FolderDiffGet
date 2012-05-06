@@ -45,7 +45,7 @@
     <Groups>
 
       <Group guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+				<Parent guid="guidEasyMDIToolWindow" id="cmdidFolderDiffToolWindow"/>
       </Group>
       
 
@@ -67,6 +67,7 @@
       <Button guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="cmdidGetFolderDiff" priority="0x0100" type="Button">
         <Parent guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
+				<CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidGetFolderDiff</CommandName>
           <ButtonText>Get Folder Diff</ButtonText>
@@ -104,6 +105,9 @@
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidGetFolderDiff" value="0x0100" />
     </GuidSymbol>
+		<GuidSymbol name="guidEasyMDIToolWindow" value="{D309F791-903F-11D0-9EFC-00A0C911004F}">
+			<IDSymbol name="cmdidFolderDiffToolWindow" value="1066"/>
+		</GuidSymbol>
     
     
     
