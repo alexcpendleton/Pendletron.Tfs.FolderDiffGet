@@ -77,18 +77,21 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 			var nullIsCanceled = Convert.ChangeType(null, _isCanceledCallbackType);
 			var nullPhase = Convert.ChangeType(null, _phaseChangedCallbackType);
 
-			var initMethod = FolderDiff._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
-			initMethod.Invoke(FolderDiff._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
-			bool? filterLocalPathsOnly = false;
-			string filter = "";
-			var view = MakeViewEnum();
-			dynamic options = new AccessPrivateWrapper(FolderDiff.Options);
-			options.UseRegistryDefaults = false;
-			if (view != null)
-			{
-				options.ViewOptions = view;
+			dynamic folderDiffInfo = new AccessPrivateWrapper(FolderDiff.m_folderDifferenceInfo);
+			if (folderDiffInfo.Count == 0) {
+
+				var initMethod = FolderDiff._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
+				initMethod.Invoke(FolderDiff._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
+				bool? filterLocalPathsOnly = false;
+				string filter = "";
+				var view = MakeViewEnum();
+				dynamic options = new AccessPrivateWrapper(FolderDiff.Options);
+				options.UseRegistryDefaults = false;
+				if (view != null) {
+					options.ViewOptions = view;
+				}
+				FolderDiff.Compare();
 			}
-			FolderDiff.Compare();
 			return FolderDiff.GetEnumerator();
 		}
 
