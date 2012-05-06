@@ -60,6 +60,8 @@ namespace Pendletron.Tfs.FolderDiffGet.Core
 		/// <remarks>Does a String.Format(message, args) and calls WriteToTrace with the result.</remarks>
 		void WriteToTrace(string message, params object[] args);
 
+		Action<string> TraceWriter { get; set; }
+
 		/// <summary>
 		/// Setups up and connects to the TfsTeamProjectCollection, uses UICredentialsProvider
 		/// </summary>

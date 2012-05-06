@@ -124,6 +124,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DownloadWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="HatPackage.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -179,6 +182,7 @@
     <Resource Include="Dependencies\license.txt" />
     <Content Include="Dependencies\Ookii.Dialogs.dll" />
     <Resource Include="Dependencies\Ookii.Dialogs.xml" />
+    <Resource Include="Resources\icon_package_get.gif" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>

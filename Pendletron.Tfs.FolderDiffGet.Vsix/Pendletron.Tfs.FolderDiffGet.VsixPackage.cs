@@ -11,14 +11,13 @@ using Microsoft.VisualStudio.Shell;
 using EnvDTE80;
 using EnvDTE;
 using System.Reflection;
-using Pendletron.Tfs.FolderDiffGet.Core.Wrappers;
-using Pendletron.Vsix.Core.Wrappers;
-using Pendletron.Tfs.FolderDiffGet.Core;
-using Microsoft.TeamFoundation.Client;
 using System.Windows.Forms;
 using Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix.UI;
+using System.ComponentModel;
+using System.Text;
 
 namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
+
 	/// <summary>
 	/// This is the class that implements the package exposed by this assembly.
 	///
@@ -71,10 +70,12 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 				menuItem.BeforeQueryStatus += new EventHandler(menuItem_BeforeQueryStatus);
 				mcs.AddCommand(menuItem);
 			}
+
 		}
 
-		protected bool IsActiveWindowFolderDiff()
-		{
+
+
+		protected bool IsActiveWindowFolderDiff() {
 			var doc = DTEInstance.ActiveDocument;
 			Guid guid = new Guid("E3FC08BE-3924-11DB-8AF6-B622A1EF5492");
 			var window = DTEInstance.ActiveWindow;
@@ -82,8 +83,7 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 			return window.ObjectKind.ToUpper().Contains(guid.ToString().ToUpper());
 		}
 
-		void menuItem_BeforeQueryStatus(object sender, EventArgs e)
-		{
+		void menuItem_BeforeQueryStatus(object sender, EventArgs e) {
 			var menuCommand = sender as MenuCommand;
 			menuCommand.Visible = IsActiveWindowFolderDiff();
 		}
@@ -123,32 +123,10 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 			return a;
 		}
 
-		public void DownloadFromFolderDiffManager(string outputDir) {
 
-			var hatpack = new HatPackage();
-			dynamic man = new AccessPrivateWrapper(hatpack._wrapped.FolderDiffManager);
-			if (man != null) {
-				dynamic toolWindow = new AccessPrivateWrapper(man.FolderDiffToolWindows[0]);
-				if (toolWindow != null) {
-					dynamic diffControl = new AccessPrivateWrapper(toolWindow.FolderDiffControl);
-					if (diffControl != null) {
-						var diff = diffControl.FolderDiff;
-						if (diff != null) {
-							var coll = hatpack.HatterasService.TeamProjectCollection as TfsTeamProjectCollection;
-
-
-							var getter = new FolderDiffInternalsGetter(diff, coll, outputDir);
-							getter.Go();
-
-						}
-					}
-				}
-			}
-		}
 		public void GetActiveDocument() {
 			if (IsActiveWindowFolderDiff()) {
-				if (_outputPane == null)
-				{
+				if (_outputPane == null) {
 					_outputPane = CreatePane(OutputPaneGuid, OutputPaneTitle, true, true);
 				}
 				var dlForm = new DownloadForm();
@@ -156,7 +134,7 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 				dlForm.Show();
 			}
 		}
-			//((Microsoft.TeamFoundation.VersionControl.Controls.ControlFolderDiffDisplay)(hatpack._wrapped.FolderDiffManager.FolderDiffToolWindows[0].FolderDiffControl)).FolderDiff
+		//((Microsoft.TeamFoundation.VersionControl.Controls.ControlFolderDiffDisplay)(hatpack._wrapped.FolderDiffManager.FolderDiffToolWindows[0].FolderDiffControl)).FolderDiff
 
 
 		public readonly Guid OutputPaneGuid = new Guid("4051A975-52F5-4D8A-9987-62E11AEB9A40");
@@ -176,46 +154,43 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 
 				// Retrieve the new pane.
 				output.GetPane(ref paneGuid, out pane);
-				
+
 			}
 			return pane;
 		}
 
 		void dlForm_Download(object sender, DownloadEventArgs e) {
-			if (!String.IsNullOrEmpty(e.Path))
-			{
-				bool listen = _outputPane != null;
-				TraceListener listener = null;
-				if (listen)
-				{
-					listener = new OutputWindowTraceListener(_outputPane);
-					Trace.Listeners.Add(listener);
-					_outputPane.Activate();
-				}
-				DownloadFromFolderDiffManager(e.Path);
-				if (listen) {
-					Trace.Listeners.Remove(listener);
-				}
-
+			if (!String.IsNullOrEmpty(e.Path)) {
+				var worker = new DownloadWorker(e.Path);
+				worker.ProgressChanged += new ProgressChangedEventHandler(worker_ProgressChanged);
+				worker.RunWorkerAsync();
 			}
 		}
-		/*
+
+		void worker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+			var message = e.UserState as string;
+			if (_outputPane != null && message != null)
+			{
+				_outputPane.OutputStringThreadSafe(Environment.NewLine);
+				_outputPane.OutputStringThreadSafe(message);
+			}
+		}
+	}
+	/*
 namespace Microsoft.VisualStudio.TeamFoundation.VersionControl
 {
 [Guid("E3FC08BE-3924-11DB-8AF6-B622A1EF5492")]
 internal class ToolWindowFolderDiff : ToolWindowPaneBase, IOleCommandTarget
 {*/
 
-	}
+}
 
-	public class OutputWindowTraceListener : TraceListener
-	{
-		public OutputWindowTraceListener(IVsOutputWindowPane pane)
-		{
-			OutputPane = pane;
-		}
-		/*
-		 * IVsOutputWindow outWindow = Package.GetGlobalService( typeof( SVsOutputWindow ) ) as IVsOutputWindow;
+public class OutputWindowTraceListener : TraceListener {
+	public OutputWindowTraceListener(IVsOutputWindowPane pane) {
+		OutputPane = pane;
+	}
+	/*
+	 * IVsOutputWindow outWindow = Package.GetGlobalService( typeof( SVsOutputWindow ) ) as IVsOutputWindow;
 
 Guid generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane; // P.S. There's also the GUID_OutWindowDebugPane available.
 IVsOutputWindowPane generalPane;
@@ -223,26 +198,20 @@ outWindow.GetPane( ref generalPaneGuid , out generalPane );
 
 generalPane.OutputString( "Hello World!" );
 generalPane.Activate(); // Brings this pane into view*/
-		public IVsOutputWindowPane OutputPane { get; set; }
-		public static IVsOutputWindowPane FindGeneralPane(IVsOutputWindow outputWindow)
-		{
-			Guid paneGuid = VSConstants.GUID_OutWindowGeneralPane;
-			IVsOutputWindowPane results;
-			outputWindow.GetPane(ref paneGuid, out results);
-			return results;
-		}
-
-		public override void Write(string message)
-		{
-			OutputPane.OutputString(message);
-		}
-
-		public override void WriteLine(string message)
-		{
-			Write(Environment.NewLine);
-			Write(message);
-		}
+	public IVsOutputWindowPane OutputPane { get; set; }
+	public static IVsOutputWindowPane FindGeneralPane(IVsOutputWindow outputWindow) {
+		Guid paneGuid = VSConstants.GUID_OutWindowGeneralPane;
+		IVsOutputWindowPane results;
+		outputWindow.GetPane(ref paneGuid, out results);
+		return results;
 	}
 
-}
+	public override void Write(string message) {
+		OutputPane.OutputString(message);
+	}
 
+	public override void WriteLine(string message) {
+		Write(Environment.NewLine);
+		Write(message);
+	}
+}

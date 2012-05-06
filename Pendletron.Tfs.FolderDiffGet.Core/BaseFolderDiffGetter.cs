@@ -21,6 +21,7 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 			ViewDifferent = true;
 			ViewSourceOnly = false;
 			ViewTargetOnly = true;
+			TraceWriter = DefaultTraceWriter;
 		}
 
 		/// <summary>
@@ -63,12 +64,22 @@ namespace Pendletron.Tfs.FolderDiffGet.Core {
 		/// </summary>
 		public bool ViewTargetOnly { get; set; }
 
+
+		public Action<string> TraceWriter { get; set; }
+
+		public virtual void DefaultTraceWriter(string message) {
+			Trace.WriteLine(message);
+		}
+
 		/// <summary>
 		/// Writes a message to the TraceListener (if available.)
 		/// </summary>
 		/// <param name="message">The message to write.</param>
 		public virtual void WriteToTrace(string message) {
-			Trace.WriteLine(message);
+			if(TraceWriter != null)
+			{
+				TraceWriter(message);
+			}
 		}
 		/// <summary>
 		/// Formats and writes a message to the TraceListener (if available.)
