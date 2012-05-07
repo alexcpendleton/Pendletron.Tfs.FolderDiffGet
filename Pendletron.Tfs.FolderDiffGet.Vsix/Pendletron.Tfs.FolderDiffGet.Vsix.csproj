@@ -129,6 +129,7 @@
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="HatPackage.cs" />
+    <Compile Include="OutputWindowTraceListener.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -145,6 +146,7 @@
     <Compile Include="UI\DownloadForm.Designer.cs">
       <DependentUpon>DownloadForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="VSCommandInterceptor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

@@ -83,7 +83,6 @@ namespace Pendletron.Tfs.FolderDiffGet.Core.Wrappers {
 				var initMethod = FolderDiff._wrapped.GetType().GetMethod("Initialize", AccessPrivateWrapper.flags, null, types, null);
 				initMethod.Invoke(FolderDiff._wrapped, new[] { nullProg, nullIsCanceled, nullPhase });
 				bool? filterLocalPathsOnly = false;
-				string filter = "";
 				var view = MakeViewEnum();
 				dynamic options = new AccessPrivateWrapper(FolderDiff.Options);
 				options.UseRegistryDefaults = false;

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using Microsoft.Win32;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -15,6 +14,10 @@ using System.Windows.Forms;
 using Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix.UI;
 using System.ComponentModel;
 using System.Text;
+using Pendletron.Tfs.FolderDiffGet.Core.Wrappers;
+using System.Collections;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.CommandBars;
 
 namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 
@@ -70,7 +73,16 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 				menuItem.BeforeQueryStatus += new EventHandler(menuItem_BeforeQueryStatus);
 				mcs.AddCommand(menuItem);
 			}
+			VSCommandInterceptor interceptor = new VSCommandInterceptor(this,
+			  typeof(Microsoft.VisualStudio.VSConstants.VSStd97CmdID).GUID,
+			  (int)Microsoft.VisualStudio.VSConstants.VSStd97CmdID.CleanSln);
 
+			interceptor.BeforeExecute += new EventHandler<EventArgs>(BeforeExecute);
+
+
+		}
+		private void BeforeExecute(object sender, EventArgs e) {
+			//TODO: Provide logic
 		}
 
 
@@ -129,6 +141,15 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 				if (_outputPane == null) {
 					_outputPane = CreatePane(OutputPaneGuid, OutputPaneTitle, true, true);
 				}
+				dynamic window = new AccessPrivateWrapper(DTEInstance.ActiveWindow);
+				dynamic bars = window.CommandBars;
+				if (bars != null) {
+					var x = new List<object>();
+					foreach (CommandBar b in bars) {
+						x.Add(b);
+						// "Folder Difference Toolbar"
+					}
+				}
 				var dlForm = new DownloadForm();
 				dlForm.Download += new EventHandler<DownloadEventArgs>(dlForm_Download);
 				dlForm.Show();
@@ -169,8 +190,7 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 
 		void worker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
 			var message = e.UserState as string;
-			if (_outputPane != null && message != null)
-			{
+			if (_outputPane != null && message != null) {
 				_outputPane.OutputStringThreadSafe(Environment.NewLine);
 				_outputPane.OutputStringThreadSafe(message);
 			}
@@ -183,35 +203,4 @@ namespace Microsoft.VisualStudio.TeamFoundation.VersionControl
 internal class ToolWindowFolderDiff : ToolWindowPaneBase, IOleCommandTarget
 {*/
 
-}
-
-public class OutputWindowTraceListener : TraceListener {
-	public OutputWindowTraceListener(IVsOutputWindowPane pane) {
-		OutputPane = pane;
-	}
-	/*
-	 * IVsOutputWindow outWindow = Package.GetGlobalService( typeof( SVsOutputWindow ) ) as IVsOutputWindow;
-
-Guid generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane; // P.S. There's also the GUID_OutWindowDebugPane available.
-IVsOutputWindowPane generalPane;
-outWindow.GetPane( ref generalPaneGuid , out generalPane );
-
-generalPane.OutputString( "Hello World!" );
-generalPane.Activate(); // Brings this pane into view*/
-	public IVsOutputWindowPane OutputPane { get; set; }
-	public static IVsOutputWindowPane FindGeneralPane(IVsOutputWindow outputWindow) {
-		Guid paneGuid = VSConstants.GUID_OutWindowGeneralPane;
-		IVsOutputWindowPane results;
-		outputWindow.GetPane(ref paneGuid, out results);
-		return results;
-	}
-
-	public override void Write(string message) {
-		OutputPane.OutputString(message);
-	}
-
-	public override void WriteLine(string message) {
-		Write(Environment.NewLine);
-		Write(message);
-	}
 }
