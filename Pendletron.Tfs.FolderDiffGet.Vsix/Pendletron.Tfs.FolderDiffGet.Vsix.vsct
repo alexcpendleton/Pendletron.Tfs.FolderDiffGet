@@ -79,11 +79,6 @@
 			<Bitmap guid="guidImages" href="Resources\icon_package_get.bmp" usedList="bmpPic1"/>
 		</Bitmaps>
 	</Commands>
-	<CommandPlacements>
-		<CommandPlacement guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="GFDMenuGroup" priority="0x100">
-			<Parent guid="guidEasyMDIToolWindow" id="cmdidFolderDiffToolWindow"/>
-		</CommandPlacement>
-	</CommandPlacements>
 	<Symbols>
 		<!-- This is the package guid. -->
 		<GuidSymbol name="guidPendletron_Tfs_FolderDiffGet_VsixPkg" value="{385620db-fbf6-47a8-928d-00029e2f01a8}" />
@@ -97,9 +92,6 @@
 		</GuidSymbol>
 		<GuidSymbol name="guidImages" value="{128927e6-f316-4ef4-a59b-a5798ff62bdf}" >
 			<IDSymbol name="bmpPic1" value="1" />
-		</GuidSymbol>
-		<GuidSymbol name="guidHatPackageCmdSet" value="{ffe1131c-8ea1-4d05-9728-34ad4611bda9}">
-			<IDSymbol name="itbrFolderDiff" value="0x1905" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>
