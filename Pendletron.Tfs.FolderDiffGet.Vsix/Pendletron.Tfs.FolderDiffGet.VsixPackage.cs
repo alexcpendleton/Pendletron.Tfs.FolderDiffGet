@@ -73,13 +73,6 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 				menuItem.BeforeQueryStatus += new EventHandler(menuItem_BeforeQueryStatus);
 				mcs.AddCommand(menuItem);
 			}
-			VSCommandInterceptor interceptor = new VSCommandInterceptor(this,
-			  typeof(Microsoft.VisualStudio.VSConstants.VSStd97CmdID).GUID,
-			  (int)Microsoft.VisualStudio.VSConstants.VSStd97CmdID.CleanSln);
-
-			interceptor.BeforeExecute += new EventHandler<EventArgs>(BeforeExecute);
-
-
 		}
 		private void BeforeExecute(object sender, EventArgs e) {
 			//TODO: Provide logic
