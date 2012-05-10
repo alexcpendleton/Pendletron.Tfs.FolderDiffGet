@@ -43,6 +43,9 @@
 			<Group guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="GFDMenuGroup" priority="0x0600">
 				<Parent guid="guidEasyMDIToolWindow" id="cmdidFolderDiffToolWindow"/>
 			</Group>
+			<Group guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="GFDToolbarGroup" priority="0x1600">
+				<Parent guid="guidHatPackageCmdSet" id="itbrFolderDiff"/>
+			</Group>
 		</Groups>
 
 		<!--Buttons section. -->
@@ -56,15 +59,26 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
-			<Button guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="cmdidGetFolderDiff" priority="0x0100" type="Button">
+			<Button guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="cmdidGetFolderDiff_Context" priority="0x0100" type="Button">
 				<Parent guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="GFDMenuGroup" />
 				<Icon guid="guidImages" id="bmpPic1" />
 				<CommandFlag>DynamicVisibility</CommandFlag>
 				<Strings>
-					<CommandName>cmdidGetFolderDiff</CommandName>
+					<CommandName>cmdidGetFolderDiff_Context</CommandName>
 					<ButtonText>Get Folder Diff</ButtonText>
 					<CanonicalName>TfsGetFolderDiff</CanonicalName>
 					<LocCanonicalName>TfsGetFolderDiff</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="cmdidGetFolderDiff_Toolbar" priority="0x0100" type="Button">
+				<Parent guid="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" id="GFDToolbarGroup" />
+				<Icon guid="guidImages" id="bmpPic1" />
+				<CommandFlag>DynamicVisibility</CommandFlag>
+				<Strings>
+					<CommandName>cmdidGetFolderDiff_Toolbar</CommandName>
+					<ButtonText>Get Folder Diff</ButtonText>
+					<CanonicalName>TfsGetFolderDiffToolbar</CanonicalName>
+					<LocCanonicalName>TfsGetFolderDiffToolbar</LocCanonicalName>
 				</Strings>
 			</Button>
 		</Buttons>
@@ -85,13 +99,18 @@
 		<!-- This is the guid used to group the menu commands together -->
 		<GuidSymbol name="guidPendletron_Tfs_FolderDiffGet_VsixCmdSet" value="{437ce542-d717-41d3-aaa0-16997a47a668}">
 			<IDSymbol name="GFDMenuGroup" value="0x1020" />
-			<IDSymbol name="cmdidGetFolderDiff" value="0x0100" />
+			<IDSymbol name="GFDToolbarGroup" value="0x1021" />
+			<IDSymbol name="cmdidGetFolderDiff_Context" value="0x0100" />
+			<IDSymbol name="cmdidGetFolderDiff_Toolbar" value="0x0101" />
 		</GuidSymbol>
 		<GuidSymbol name="guidEasyMDIToolWindow" value="{D309F791-903F-11D0-9EFC-00A0C911004F}">
 			<IDSymbol name="cmdidFolderDiffToolWindow" value="1066"/>
 		</GuidSymbol>
 		<GuidSymbol name="guidImages" value="{128927e6-f316-4ef4-a59b-a5798ff62bdf}" >
 			<IDSymbol name="bmpPic1" value="1" />
+		</GuidSymbol>
+		<GuidSymbol name="guidHatPackageCmdSet" value="{ffe1131c-8ea1-4d05-9728-34ad4611bda9}">
+			<IDSymbol name="itbrFolderDiff" value="0x1905" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

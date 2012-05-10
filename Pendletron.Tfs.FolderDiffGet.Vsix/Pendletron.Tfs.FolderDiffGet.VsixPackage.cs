@@ -68,10 +68,15 @@ namespace Pendletron.Pendletron_Tfs_FolderDiffGet_Vsix {
 			OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 			if (null != mcs) {
 				// Create the command for the menu item.
-				CommandID menuCommandID = new CommandID(GuidList.guidPendletron_Tfs_FolderDiffGet_VsixCmdSet, (int)PkgCmdIDList.cmdidGetFolderDiff);
+				CommandID menuCommandID = new CommandID(GuidList.guidPendletron_Tfs_FolderDiffGet_VsixCmdSet, (int)PkgCmdIDList.cmdidGetFolderDiff_Context);
 				OleMenuCommand menuItem = new OleMenuCommand(MenuItemCallback, menuCommandID);
 				menuItem.BeforeQueryStatus += new EventHandler(menuItem_BeforeQueryStatus);
 				mcs.AddCommand(menuItem);
+
+				// Create the command for the menu item.
+				CommandID menuCommandID_Toolbar = new CommandID(GuidList.guidPendletron_Tfs_FolderDiffGet_VsixCmdSet, (int)PkgCmdIDList.cmdidGetFolderDiff_Toolbar);
+				OleMenuCommand menuItem_Toolbar = new OleMenuCommand(MenuItemCallback, menuCommandID_Toolbar);
+				mcs.AddCommand(menuItem_Toolbar);
 			}
 		}
 		private void BeforeExecute(object sender, EventArgs e) {
